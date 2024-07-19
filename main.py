@@ -1,0 +1,74 @@
+import pygame
+import math
+import sys
+
+from settings import *
+
+
+pygame.init()
+
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption('Raycasting')
+clock = pygame.time.Clock()
+
+def draw_map():
+    for row in range(8):
+        for col in range(8):
+            # calculate square index
+            square = row * MAP_SIZE + col
+            
+            # draw map in the game window
+            pygame.draw.rect(
+                screen,
+                (200, 200, 200) if MAP[square] == '#' else (100, 100, 100),
+                (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE - 2, TILE_SIZE - 2)
+            )
+
+    pygame.draw.circle(screen, (255, 0, 0), (int(player_x), int(player_y)), 8)
+
+    # draw player direction
+    pygame.draw.line(screen, (0, 255, 0), (player_x, player_y),
+                                       (player_x - math.sin(player_angle) * 50,
+                                        player_y + math.cos(player_angle) * 50), 2)
+    
+    # draw player FOV
+    pygame.draw.line(screen, (0, 255, 0), (player_x, player_y),
+                                       (player_x - math.sin(player_angle - HALF_FOV) * 50,
+                                        player_y + math.cos(player_angle - HALF_FOV) * 50), 2)
+    
+    pygame.draw.line(screen, (0, 255, 0), (player_x, player_y),
+                                       (player_x - math.sin(player_angle + HALF_FOV) * 50,
+                                        player_y + math.cos(player_angle + HALF_FOV) * 50), 2)
+
+def raycasting():
+    start_angle = player_angle - HALF_FOV
+
+    for ray in range(CASTED_RAYS):
+        pass
+    
+    start_angle += STEP_ANGLE
+
+running = True
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    screen.fill(SCREEN_COLOR)
+    draw_map()
+
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_LEFT]: player_angle -= 0.1
+    if keys[pygame.K_RIGHT]: player_angle += 0.1
+
+    if keys[pygame.K_w]: player_y -= 1
+    if keys[pygame.K_s]: player_y += 1
+    if keys[pygame.K_a]: player_x -= 1
+    if keys[pygame.K_d]: player_x += 1
+
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()
